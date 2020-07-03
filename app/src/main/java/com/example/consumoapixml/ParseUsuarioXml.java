@@ -1,7 +1,6 @@
 package com.example.consumoapixml;
 
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.StringReader;
@@ -21,11 +20,43 @@ public class ParseUsuarioXml {
             parser.setInput(new StringReader(conteudo));
 
             int eventType = parser.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT){
-                
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        tagAtual = parser.getName();
+                        if (tagAtual.equals("usuarios")) {
+                            dadosNaTag = true;
+                            usuario = new Usuario();
+                            usuarioList.add(usuario);
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        if (parser.getName().equals("usuarios")) {
+                            dadosNaTag = false;
+                        }
+                        tagAtual = "";
+                        break;
+                    case XmlPullParser.TEXT:
+                        if (dadosNaTag && usuario != null) {
+                            switch (tagAtual) {
+                                case "id":
+                                    usuario.setId(Integer.parseInt(parser.getText()));
+                                    break;
+                                case "nome":
+                                    usuario.setNome(parser.getText());
+                                    break;
+                                case "idade":
+                                    usuario.setIdade(Integer.parseInt(parser.getText()));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                }
+                eventType = parser.next();
             }
             return usuarioList;
-        } catch (XmlPullParserException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
