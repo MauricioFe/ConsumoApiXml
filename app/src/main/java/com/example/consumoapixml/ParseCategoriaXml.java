@@ -1,61 +1,63 @@
 package com.example.consumoapixml;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseUsuarioXml {
-    public static List<Usuario> parseDados(String conteudo) {
+public class ParseCategoriaXml {
+
+    public static List<Categoria> parseDados(String conteudo) {
         try {
             boolean dadosNaTag = false;
             String tagAtual = "";
-            Usuario usuario = null;
-            List<Usuario> usuarioList = new ArrayList<>();
-
+            Categoria categoria = null;
+            List<Categoria> categoriaList = new ArrayList<>();
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(conteudo));
 
+            parser.setInput(new StringReader(conteudo));
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         tagAtual = parser.getName();
-                        if (tagAtual.equals("usuarios")) {
+                        if (tagAtual.equals("Categoria")) {
                             dadosNaTag = true;
-                            usuario = new Usuario();
-                            usuarioList.add(usuario);
+                            categoria = new Categoria();
+                            categoriaList.add(categoria);
                         }
                         break;
                     case XmlPullParser.END_TAG:
-                        if (parser.getName().equals("usuarios")) {
+                        if (parser.getName().equals("Categoria")) {
                             dadosNaTag = false;
                         }
                         tagAtual = "";
                         break;
+
                     case XmlPullParser.TEXT:
-                        if (dadosNaTag && usuario != null) {
+                        if (dadosNaTag && categoria != null) {
                             switch (tagAtual) {
                                 case "id":
-                                    usuario.setId(Integer.parseInt(parser.getText()));
+                                    categoria.setId(Integer.parseInt(parser.getText()));
                                     break;
-                                case "nome":
-                                    usuario.setNome(parser.getText());
-                                    break;
-                                case "idade":
-                                    usuario.setIdade(Integer.parseInt(parser.getText()));
+                                case "descricao":
+                                    categoria.setDescricao(parser.getText());
                                     break;
                                 default:
                                     break;
                             }
                         }
+                        break;
                 }
                 eventType = parser.next();
             }
-            return usuarioList;
+
+            return categoriaList;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
